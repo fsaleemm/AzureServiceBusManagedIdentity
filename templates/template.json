@@ -1,0 +1,170 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "servicebus_namespaces": {
+            "defaultValue": "sb-fs-demo-mi",
+            "type": "String"
+        },
+        "function_app_name": {
+            "defaultValue": "func-fs-demo-mi",
+            "type": "String"
+        },
+        "serverfarms_ASP_name": {
+            "defaultValue": "ASP-linux-fs-demo-mi",
+            "type": "String"
+        },
+        "storageAccounts_name": {
+            "defaultValue": "stfsdemomi",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.ServiceBus/namespaces",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[parameters('servicebus_namespaces')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Premium",
+                "tier": "Premium",
+                "capacity": 1
+            },
+            "properties": {
+                "zoneRedundant": false
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('servicebus_namespaces'), '/myDemoClient')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('servicebus_namespaces'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/topics",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[concat(parameters('servicebus_namespaces'), '/sbt-fs-demo')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('servicebus_namespaces'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/topics/subscriptions",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[concat(parameters('servicebus_namespaces'), '/sbt-fs-demo/fs-demo-s1')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces/topics', parameters('servicebus_namespaces'), 'sbt-fs-demo')]",
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('servicebus_namespaces'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ServiceBus/namespaces/topics/subscriptions",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[concat(parameters('servicebus_namespaces'), '/sbt-fs-demo/fs-demo-s2')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces/topics', parameters('servicebus_namespaces'), 'sbt-fs-demo')]",
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('servicebus_namespaces'))]"
+            ],
+            "properties": {
+                "maxDeliveryCount": 10
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[parameters('serverfarms_ASP_name')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "linux",
+            "properties": {
+                "reserved": true
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-01-01",
+            "name": "[parameters('storageAccounts_name')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage"
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('function_app_name')]",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp,linux",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_name'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_name'))]",
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('servicebus_namespaces'))]"
+            ],
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_name'))]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                        "name": "AzureWebJobsStorage",
+                        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccounts_name'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_name')), '2019-06-01').keys[0].value)]"
+                        },
+                        {
+                        "name": "FUNCTIONS_EXTENSION_VERSION",
+                        "value": "~3"
+                        },
+                        {
+                        "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                        "value": "[reference(resourceId('microsoft.insights/components', parameters('function_app_name')), '2020-02-02-preview').InstrumentationKey]"
+                        },
+                        {
+                        "name": "FUNCTIONS_WORKER_RUNTIME",
+                        "value": "python"
+                        },
+                        {
+                            "name": "SERVICE_BUS_FULLY_QUALIFIED_NAMESPACE",
+                            "value": "[uri(reference(resourceId('Microsoft.ServiceBus/namespaces', parameters('servicebus_namespaces')), '2018-01-01-preview').serviceBusEndpoint, '')]"
+                        },
+                        {
+                            "name": "SERVICE_BUS_TOPIC_NAME",
+                            "value": "sbt-fs-demo"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "microsoft.insights/components",
+            "apiVersion": "2020-02-02-preview",
+            "name": "[parameters('function_app_name')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:', resourceId('Microsoft.Web/sites', parameters('function_app_name')))]": "Resource"
+            },
+            "properties": {
+                "ApplicationId": "[parameters('function_app_name')]",
+                "Application_Type": "web"
+            }
+        }
+    ]
+}
