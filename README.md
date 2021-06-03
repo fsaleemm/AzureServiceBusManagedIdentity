@@ -23,32 +23,40 @@ The following components will be deployed to your resource group.
 
 1. Deploy the components using the Deploy to Azure button above.
 1. Start the Receiver.
+
 ```bash
 python Reciever.py
 ```
+
 1. Send a message using the Connection string sender script.
+
 ```bash
 python SendTopicCS.py
 ```
+
 1. Walk through the Default Credential authentication flow.
 1. Send a message using the default credential sender script.
+
 ```bash
 python SendTopicMI.py
 ```
+
 1. Explain the Send Claim error.
 1. Setup the Send Role in Azure Service Bus to include your user.
 1. Send a message using the default credential sender script. There will be no error.
 1. Check the Receiver that the message was received.
 1. Walk through the custom authentication flow.
 1. Send a message using the chained token credential sender script.
+
 ```bash
 python SendTopicMI2.py
 ```
+
 1. Check the Receiver that the message was received.
 1. Deploy the SendToSB function to the Function App.
 1. Setup the Managed Identity for Function App.
 1. Setup the Send Role in Azure Service Bus to include the Function App Managed Identity.
-1. Run the SendToSB function via Azure Portal. 
-1. 1. Check the Receiver that the message was received.
+1. Run the SendToSB function via Azure Portal.
+1. Check the Receiver that the message was received.
 
 Disclaimer: This is a sample application/code with rudimentary error/exception handling and no unit testing. It is intended as an illustration/demo and not for production use.
