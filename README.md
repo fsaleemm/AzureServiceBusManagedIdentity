@@ -8,7 +8,7 @@ This is sample code to demonstrate how credentials and authentication flow work 
 
 The sample includes the following:
 
-1. Reciever.py: This receiver subscribes to one of the Subscriptions for the Topic.
+1. Receiver.py: This receiver subscribes to one of the Subscriptions for the Topic.
 1. SendTopicCS.py: This sends a message to the Topic using the traditional Service Bus Connection string.
 1. SendTopicMI.py: This sends a message to the Topic using the Default Azure Credential.
 1. SendTopicMI2.py: This sends a message to the Topic using the Chained Token Credential.
@@ -24,22 +24,22 @@ The following components will be deployed to your resource group.
 1. Deploy the components using the Deploy to Azure button above.
 1. Start the Receiver.
 
-```bash
-python Reciever.py
-```
+    ```bash
+    python Receiver.py
+    ```
 
 1. Send a message using the Connection string sender script.
 
-```bash
-python SendTopicCS.py
-```
+    ```bash
+    python SendTopicCS.py
+    ```
 
 1. Walk through the Default Credential authentication flow.
 1. Send a message using the default credential sender script.
 
-```bash
-python SendTopicMI.py
-```
+    ```bash
+    python SendTopicMI.py
+    ```
 
 1. Explain the Send Claim error.
 1. Setup the Send Role in Azure Service Bus to include your user.
@@ -48,9 +48,9 @@ python SendTopicMI.py
 1. Walk through the custom authentication flow.
 1. Send a message using the chained token credential sender script.
 
-```bash
-python SendTopicMI2.py
-```
+    ```bash
+    python SendTopicMI2.py
+    ```
 
 1. Check the Receiver that the message was received.
 1. Deploy the SendToSB function to the Function App.
