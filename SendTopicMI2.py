@@ -22,7 +22,7 @@ with servicebus_client:
     sender = servicebus_client.get_topic_sender(topic_name=TOPIC_NAME)
     with sender:
         # send one message        
-        message = ServiceBusMessage("This is message using Chained Managed Identity")
+        message = ServiceBusMessage("This is message using Chained Credentail - Managed Identity, Azure CLI")
         sender.send_messages(message)
         print("Sent a single message")
 

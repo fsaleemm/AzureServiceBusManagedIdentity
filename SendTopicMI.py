@@ -16,7 +16,7 @@ with servicebus_client:
     sender = servicebus_client.get_topic_sender(topic_name=TOPIC_NAME)
     with sender:
         # send one message        
-        message = ServiceBusMessage("This is message using Managed Identity")
+        message = ServiceBusMessage("This is message using Default Azure Credential")
         sender.send_messages(message)
         print("Sent a single message")
 
