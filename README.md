@@ -36,7 +36,7 @@ The following components will be deployed to your resource group.
 
     ![Receiver Connection String](/images/reccs.PNG)
 
-1. Walk through the Default Credential authentication flow.
+1. Walk through the [Default Credential authentication flow](https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/identity/azure-identity#defaultazurecredential).
 1. Send a message using the default credential sender script.
 
     ```bash
@@ -48,16 +48,23 @@ The following components will be deployed to your resource group.
 1. Explain the Send Claim error.
 1. Setup the Send Role in Azure Service Bus to include your user.
 1. Send a message using the default credential sender script. There will be no error.
-1. Walk through the custom authentication flow.
+
+     ![Receiver Default Credentail](/images/recmi1.PNG)
+
+1. Walk through the [custom authentication flow](https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/identity/azure-identity#defining-a-custom-authentication-flow-with-chainedtokencredential).
 1. Send a message using the chained token credential sender script.
 
     ```bash
     python SendTopicMI2.py
     ```
 
+    ![Receiver Chained Credentail](/images/recmi2.PNG)
+
 1. Deploy the SendToSB function to the Function App.
 1. Setup the Managed Identity for Function App.
 1. Setup the Send Role in Azure Service Bus to include the Function App Managed Identity.
 1. Run the SendToSB function via Azure Portal.
+
+    ![Receiver Final](/images/recfinal.PNG)
 
 Disclaimer: This is a sample application/code with rudimentary error/exception handling and no unit testing. It is intended as an illustration/demo and not for production use.
