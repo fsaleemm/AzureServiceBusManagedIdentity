@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "servicebus_namespaces": {
+            "value": "sb-fs-demo-mi"
+        },
+        "serverfarms_ASP_name": {
+            "value": "ASP-linux-fs-demo-mi"
+        },
+        "function_app_name": {
+            "value": "func-fs-demo-mi"
+        },
+        "storageAccounts_name": {
+            "value": "stfsdemomi"
+        }
+    }
+}
